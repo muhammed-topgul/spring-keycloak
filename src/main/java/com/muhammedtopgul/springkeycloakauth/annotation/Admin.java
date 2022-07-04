@@ -8,7 +8,8 @@ import java.lang.annotation.*;
  * @author muhammed-topgul
  * @since 01/07/2022 16:43
  */
-@PreAuthorize("hasRole('Admin')")
+//@PreAuthorize("hasRole('Admin')")
+@PreAuthorize("hasRole(T(com.muhammedtopgul.springkeycloakauth.annotation.Permission).ADMIN)")
 @Documented
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

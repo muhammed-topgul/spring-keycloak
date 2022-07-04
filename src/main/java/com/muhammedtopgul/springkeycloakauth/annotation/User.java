@@ -8,9 +8,9 @@ import java.lang.annotation.*;
  * @author muhammed-topgul
  * @since 01/07/2022 16:43
  */
-@PreAuthorize("hasAnyRole('Admin', 'User')")
+@PreAuthorize("isAuthenticated()")
 @Documented
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface User {
 }

@@ -52,9 +52,14 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http
+                .csrf().disable()
                 .authorizeRequests()
-//                .antMatchers("/customers*").hasRole("USER")
-//                .antMatchers("/admin*").hasRole("ADMIN")
+                .antMatchers("/**/employees/hello")
+                .permitAll()
+                .antMatchers("/**/employees/login")
+                .permitAll()
+                .antMatchers("/api/**")
+                .authenticated()
                 .anyRequest().permitAll();
     }
 }
