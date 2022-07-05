@@ -2,15 +2,19 @@ package com.muhammedtopgul.springkeycloakauth.controller;
 
 import com.muhammedtopgul.springkeycloakauth.annotation.Admin;
 import com.muhammedtopgul.springkeycloakauth.config.KeycloakConfig;
+import com.muhammedtopgul.springkeycloakauth.dto.AuthDto;
 import com.muhammedtopgul.springkeycloakauth.dto.UserDto;
 import com.muhammedtopgul.springkeycloakauth.entity.Employee;
 import com.muhammedtopgul.springkeycloakauth.service.EmployeeService;
 import com.muhammedtopgul.springkeycloakauth.service.KeycloakAdminClientService;
 import lombok.RequiredArgsConstructor;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -27,12 +31,24 @@ public class EmployeeController {
     private final KeycloakConfig keycloakConfig;
 
     @GetMapping("/{employeeId}")
-    public ResponseEntity<Employee> findById(@PathVariable long employeeId) {
+    public ResponseEntity<Employee> findById(@PathVariable long employeeId, Principal principal) {
         return ResponseEntity.ok(employeeService.findById(employeeId));
     }
 
+    @GetMapping("/userDetails")
+    public ResponseEntity<AuthDto> getUserDetails(Principal principal) {
+        KeycloakAuthenticationToken keycloakAuthenticationToken = (KeycloakAuthenticationToken) principal;
+        AccessToken accessToken = keycloakAuthenticationToken.getAccount().getKeycloakSecurityContext().getToken();
+
+        AuthDto userDto = new AuthDto();
+        userDto.setUsername(accessToken.getPreferredUsername());
+        userDto.setEmail(accessToken.getEmail());
+        userDto.setFullName(accessToken.getName());
+        return ResponseEntity.ok(userDto);
+    }
+
+    //    @RolesAllowed({Permission.ADMIN, Permission.USER})
     @Admin
-//    @RolesAllowed({Permission.ADMIN, Permission.USER})
     @GetMapping
     public ResponseEntity<List<Employee>> findAll() {
         return ResponseEntity.ok(employeeService.findAll());

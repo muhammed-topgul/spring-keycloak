@@ -25,7 +25,6 @@ public class KeycloakConfig {
     public final static String clientSecret = "VuJ2LzksMZmVr8TfODu7vTaYEM3ozXnd";
     public final static String userName = "medium-test-admin";
     public final static String password = "12345";
-    public final static String grantType = "password";
     public final static String client = "medium-test-frontend-client";
 
     public KeycloakConfig() {
@@ -33,7 +32,6 @@ public class KeycloakConfig {
 
     public static Keycloak getInstance() {
         if (keycloak == null) {
-
             keycloak = KeycloakBuilder.builder()
                     .serverUrl(serverUrl)
                     .realm(realm)

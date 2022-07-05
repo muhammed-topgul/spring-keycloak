@@ -20,16 +20,16 @@ public class KeycloakAdminClientService {
         UsersResource usersResource = KeycloakConfig.getInstance().realm(KeycloakConfig.realm).users();
         CredentialRepresentation credentialRepresentation = createPasswordCredentials(user.getPassword());
 
-        UserRepresentation kcUser = new UserRepresentation();
-        kcUser.setUsername(user.getEmail());
-        kcUser.setCredentials(Collections.singletonList(credentialRepresentation));
-        kcUser.setUsername(user.getFirstName());
-        kcUser.setEmail(user.getEmail());
-        kcUser.setFirstName(user.getFirstName());
-        kcUser.setLastName(user.getLastName());
-        kcUser.setEnabled(true);
-        kcUser.setEmailVerified(false);
-        Response response = usersResource.create(kcUser);
+        UserRepresentation userRepresentation = new UserRepresentation();
+        userRepresentation.setUsername(user.getEmail());
+        userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
+        userRepresentation.setUsername(user.getFirstName());
+        userRepresentation.setEmail(user.getEmail());
+        userRepresentation.setFirstName(user.getFirstName());
+        userRepresentation.setLastName(user.getLastName());
+        userRepresentation.setEnabled(true);
+        userRepresentation.setEmailVerified(false);
+        Response response = usersResource.create(userRepresentation);
         return response.getStatus();
     }
 
