@@ -9,6 +9,7 @@ import com.muhammedtopgul.springkeycloakauth.service.EmployeeService;
 import com.muhammedtopgul.springkeycloakauth.service.KeycloakAdminClientService;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.authorization.client.util.Http;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +65,28 @@ public class EmployeeController {
     public ResponseEntity<AccessTokenResponse> login(@RequestBody UserDto user) {
         AccessTokenResponse accessTokenResponse = keycloakConfig.getAuthZClient().obtainAccessToken(user.getFirstName(), user.getPassword());
         return ResponseEntity.ok(accessTokenResponse);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AccessTokenResponse> refreshToken(@RequestParam("refreshToken") String refreshToken) {
+        String url = KeycloakConfig.serverUrl + "/realms/" + KeycloakConfig.realm + "/protocol/openid-connect/token";
+        String clientId = KeycloakConfig.clientId;
+        String secret = KeycloakConfig.clientSecret;
+        Http http = new Http(keycloakConfig.getAuthZClient().getConfiguration(), (params, headers) -> {
+        });
+
+        AccessTokenResponse response = http.<AccessTokenResponse>post(url)
+                .authentication()
+                .client()
+                .form()
+                .param("grant_type", "refresh_token")
+                .param("refresh_token", refreshToken)
+                .param("client_id", clientId)
+                .param("client_secret", secret)
+                .response()
+                .json(AccessTokenResponse.class)
+                .execute();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/hello")

@@ -58,6 +58,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/**/employees/login")
                 .permitAll()
+                .antMatchers("/**/employees/refresh-token")
+                .permitAll()
                 .antMatchers("/api/**")
                 .authenticated()
                 .anyRequest().permitAll();
