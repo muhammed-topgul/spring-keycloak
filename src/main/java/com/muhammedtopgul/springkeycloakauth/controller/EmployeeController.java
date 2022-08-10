@@ -9,14 +9,19 @@ import com.muhammedtopgul.springkeycloakauth.service.EmployeeService;
 import com.muhammedtopgul.springkeycloakauth.service.KeycloakAdminClientService;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.authorization.client.util.Http;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.muhammedtopgul.springkeycloakauth.config.KeycloakConfig.realm;
 
 /**
  * @author muhammed-topgul
@@ -69,7 +74,7 @@ public class EmployeeController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<AccessTokenResponse> refreshToken(@RequestParam("refreshToken") String refreshToken) {
-        String url = KeycloakConfig.serverUrl + "/realms/" + KeycloakConfig.realm + "/protocol/openid-connect/token";
+        String url = KeycloakConfig.serverUrl + "/realms/" + realm + "/protocol/openid-connect/token";
         String clientId = KeycloakConfig.clientId;
         String secret = KeycloakConfig.clientSecret;
         Http http = new Http(keycloakConfig.getAuthZClient().getConfiguration(), (params, headers) -> {
@@ -92,5 +97,66 @@ public class EmployeeController {
     @GetMapping("/hello")
     public String getMessage() {
         return "Hello!";
+    }
+
+
+    @GetMapping("/set-role/{userName}")
+    public void setRole(@PathVariable String userName) {
+        System.out.println(getAllRoles());
+        String userId = KeycloakConfig.getInstance()
+                .realm(realm)
+                .users()
+                .search(userName)
+                .get(0)
+                .getId();
+
+        UserResource user = KeycloakConfig.getInstance()
+                .realm(realm)
+                .users()
+                .get(userId);
+
+        List<RoleRepresentation> roleToAdd = new LinkedList<>();
+        roleToAdd.add(KeycloakConfig.getInstance()
+                .realm(realm)
+                .roles()
+                .get("Admin")
+                .toRepresentation()
+        );
+        user.roles().realmLevel().add(roleToAdd);
+    }
+
+    @GetMapping("/remove-role/{userName}")
+    public void removeRole(@PathVariable String userName) {
+        System.out.println(getAllRoles());
+        String userId = KeycloakConfig.getInstance()
+                .realm(realm)
+                .users()
+                .search(userName)
+                .get(0)
+                .getId();
+
+        UserResource user = KeycloakConfig.getInstance()
+                .realm(realm)
+                .users()
+                .get(userId);
+
+        List<RoleRepresentation> roleToAdd = new LinkedList<>();
+        roleToAdd.add(KeycloakConfig.getInstance()
+                .realm(realm)
+                .roles()
+                .get("Admin")
+                .toRepresentation()
+        );
+        user.roles().realmLevel().remove(roleToAdd);
+    }
+
+    public List<String> getAllRoles() {
+        return KeycloakConfig.getInstance()
+                .realm(realm)
+                .roles()
+                .list()
+                .stream()
+                .map(RoleRepresentation::getName)
+                .collect(Collectors.toList());
     }
 }
